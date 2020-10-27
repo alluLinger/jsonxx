@@ -24,6 +24,7 @@
 #include <array>
 #include <vector>
 #include <cstdint>
+#include <optional>
 
 namespace jsonxx
 {
@@ -493,90 +494,84 @@ namespace jsonxx
 	public:
 		// GET value functions
 
-		inline bool get_value(boolean_type &val) const
+		std::optional<boolean_type> get_boolean() const 
 		{
-			if (is_boolean())
+			if(is_boolean()) 
 			{
-				val = value_.data.boolean;
-				return true;
+				return value_.data.boolean;
 			}
-			return false;
+			return std::nullopt;
 		}
 
-		inline bool get_value(integer_type &val) const
+		std::optional<integer_type> get_integer() const 
 		{
-			if (is_integer())
-			{
-				val = value_.data.number_integer;
-				return true;
+			if(is_integer())
+            {
+                return value_.data.number_integer;
 			}
-			return false;
-		}
-
-		inline bool get_value(float_type &val) const
-		{
-			if (is_float())
-			{
-				val = value_.data.number_float;
-				return true;
-			}
-			return false;
+			return std::nullopt;
 		}
 
 		template <
 			typename _IntegerUTy,
 			typename std::enable_if<std::is_integral<_IntegerUTy>::value, int>::type = 0>
-		inline bool get_value(_IntegerUTy &val) const
+		std::optional<_IntegerUTy> get_integer() const
 		{
 			if (is_integer())
 			{
-				val = static_cast<_IntegerUTy>(value_.data.number_integer);
-				return true;
+				return static_cast<_IntegerUTy>(value_.data.number_integer);
 			}
-			return false;
+			return std::nullopt;
+		}
+		
+		std::optional<float_type> get_float() const 
+		{
+			if (is_float())
+			{
+				return value_.data.number_float;
+			}
+			return std::nullopt;
 		}
 
 		template <
 			typename _FloatingTy,
 			typename std::enable_if<std::is_floating_point<_FloatingTy>::value, int>::type = 0>
-		inline bool get_value(_FloatingTy &val) const
+		std::optional<_FloatingTy> get_float() const 
 		{
 			if (is_float())
 			{
-				val = static_cast<_FloatingTy>(value_.data.number_float);
-				return true;
+				return static_cast<_FloatingTy>(value_.data.number_float);
 			}
-			return false;
+			return std::nullopt;
 		}
 
-		inline bool get_value(array_type &val) const
+		std::optional<array_type> get_array() const
 		{
 			if (is_array())
 			{
+				array_type val;
 				val.assign((*value_.data.vector).begin(), (*value_.data.vector).end());
-				return true;
+				return val;
 			}
-			return false;
+			return std::nullopt;
 		}
 
-		inline bool get_value(string_type &val) const
+		std::optional<string_type> get_string() const
 		{
 			if (is_string())
 			{
-				val.assign(*value_.data.string);
-				return true;
+				return *value_.data.string;
 			}
-			return false;
+			return std::nullopt;
 		}
 
-		inline bool get_value(object_type &val) const
+		std::optional<object_type> get_object() const
 		{
 			if (is_object())
 			{
-				val.assign(*value_.data.object);
-				return true;
+				return *value_.data.object;
 			}
-			return false;
+			return std::nullopt;
 		}
 
 		boolean_type as_bool() const
